@@ -3,6 +3,7 @@ import { moodLabel, otherPerson, personLabel, validateBox, ValidationResult } fr
 import { newId } from '../common/store';
 import { DEMO_PHOTOS, photoResource } from '../common/photos';
 import { Theme } from '../common/theme';
+import { Chip } from './Chip';
 
 type DateMode = 'minutes' | 'datetime';
 
@@ -46,26 +47,23 @@ export struct CreateView {
   }
 
   @Builder
-  chip(text: string, selected: boolean, id: string, action: () => void) {
-    Text(text)
-      .id(id)
-      .fontSize(14)
-      .fontColor(selected ? Color.White : Theme.TEXT)
-      .backgroundColor(selected ? Theme.PRIMARY : Theme.CARD)
-      .border({ width: 1, color: selected ? Theme.PRIMARY : '#E6DCE0' })
-      .borderRadius(18)
-      .padding({ left: 14, right: 14, top: 8, bottom: 8 })
-      .onClick(action)
-  }
-
-  @Builder
   dateSection() {
     Row({ space: 8 }) {
-      this.chip('In N minutes', this.dateMode === 'minutes', 'mode_minutes', () => {
-        this.dateMode = 'minutes';
+      Chip({
+        label: 'In N minutes',
+        selected: this.dateMode === 'minutes',
+        chipId: 'mode_minutes',
+        onTap: () => {
+          this.dateMode = 'minutes';
+        }
       })
-      this.chip('Date & time', this.dateMode === 'datetime', 'mode_datetime', () => {
-        this.dateMode = 'datetime';
+      Chip({
+        label: 'Date & time',
+        selected: this.dateMode === 'datetime',
+        chipId: 'mode_datetime',
+        onTap: () => {
+          this.dateMode = 'datetime';
+        }
       })
     }
 
@@ -87,8 +85,13 @@ export struct CreateView {
 
       Row({ space: 8 }) {
         ForEach(QUICK_MINUTES, (m: number) => {
-          this.chip(m === 60 ? '1 h' : `${m} min`, this.minutes === `${m}`, `quick_${m}`, () => {
-            this.minutes = `${m}`;
+          Chip({
+            label: m === 60 ? '1 h' : `${m} min`,
+            selected: this.minutes === `${m}`,
+            chipId: `quick_${m}`,
+            onTap: () => {
+              this.minutes = `${m}`;
+            }
           })
         }, (m: number) => `${m}`)
       }
@@ -122,8 +125,13 @@ export struct CreateView {
   moodSection() {
     Column({ space: 8 }) {
       ForEach(MOODS, (m: Mood) => {
-        this.chip(moodLabel(m), this.mood === m, `mood_${m}`, () => {
-          this.mood = m;
+        Chip({
+          label: moodLabel(m),
+          selected: this.mood === m,
+          chipId: `mood_${m}`,
+          onTap: () => {
+            this.mood = m;
+          }
         })
       }, (m: Mood) => m)
     }
@@ -170,11 +178,21 @@ export struct CreateView {
 
           this.label('UNLOCKS')
           Row({ space: 8 }) {
-            this.chip('On a date', this.unlockType === 'date', 'unlock_date', () => {
-              this.unlockType = 'date';
+            Chip({
+              label: 'On a date',
+              selected: this.unlockType === 'date',
+              chipId: 'unlock_date',
+              onTap: () => {
+                this.unlockType = 'date';
+              }
             })
-            this.chip('At a moment', this.unlockType === 'mood', 'unlock_mood', () => {
-              this.unlockType = 'mood';
+            Chip({
+              label: 'At a moment',
+              selected: this.unlockType === 'mood',
+              chipId: 'unlock_mood',
+              onTap: () => {
+                this.unlockType = 'mood';
+              }
             })
           }
 
