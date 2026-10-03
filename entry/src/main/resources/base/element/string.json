@@ -2,15 +2,15 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "Open When: gift boxes for two that unlock at the right moment"
+      "value": "Kochanie: gift boxes for two that unlock at the right moment"
     },
     {
       "name": "EntryAbility_desc",
-      "value": "Open When main ability"
+      "value": "Kochanie main ability"
     },
     {
       "name": "EntryAbility_label",
-      "value": "Open When"
+      "value": "Kochanie"
     },
     {
       "name": "widget_name",
@@ -18,7 +18,7 @@
     },
     {
       "name": "widget_desc",
-      "value": "Live countdown to the next Open When box"
+      "value": "Live countdown to the next Kochanie box"
     },
     {
       "name": "reminder_reason",

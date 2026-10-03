@@ -34,7 +34,7 @@ struct NextBoxCard {
 
   build() {
     Column({ space: 4 }) {
-      Text('OPEN WHEN')
+      Text('KOCHANIE')
         .fontSize(11)
         .fontWeight(FontWeight.Bold)
         .fontColor('#FFE3EA')

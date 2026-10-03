@@ -1,6 +1,6 @@
 # AI workflow
 
-How AI was used to build Open When, and how its output was checked.
+How AI was used to build Kochanie (working name "Open When"), and how its output was checked.
 
 ## Tools
 
@@ -50,7 +50,7 @@ as things to fix) → `oniro-app app install` + `launch` → drive the UI with
 - **A locked box stayed locked at 00:00.** The `canOpen` result was passed into a `@Builder` as
   a by-value argument, which ArkUI does not re-evaluate when `now` changes. It is now computed
   from state inside the builder. Found only by watching the countdown on the emulator.
-- The launcher label read "label" (template default). It is now "Open When".
+- The launcher label read "label" (template default). It was set to "Open When", later renamed to "Kochanie".
 
 ## Round 2: timed unlocks that work without the app
 
@@ -79,6 +79,14 @@ Bugs found while verifying:
   the clock.
 - After reinstalling, the launcher keeps a dead widget renderer (system log). Documented:
   re-add the widget.
+
+## Round 3: rename to Kochanie
+
+The developer asked to rename the app from its working name "Open When" to "Kochanie". Every
+user-visible string was changed (launcher label, header, widget label and description). The
+bundle name, preferences file names and log tag were kept on purpose, so existing data and
+widgets keep working. Verified on the emulator: the existing boxes were still there and the
+widget kept updating.
 
 ## What the developer did
 

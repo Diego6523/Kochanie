@@ -1,4 +1,4 @@
-# Open When
+# Kochanie
 
 HackYeah 2026 · Huawei challenge "Imagine What's Next" · OpenHarmony app
 
@@ -41,6 +41,9 @@ All in `entry/src/main/ets/common/rules.ets` (pure functions, unit-tested):
 3. The sender can never open their own box; they only see its status.
 4. A date box opens only when `now >= at`. A mood box opens any time, after confirmation.
 5. Validation errors are shown as messages, never as crashes.
+
+Internal identifiers keep the project's original working name: bundle `com.zuzu.openwhen`, log
+tag `OpenWhen`, storage files `openwhen*`. Changing them would wipe data already on a device.
 
 ## Requirements
 
@@ -89,7 +92,7 @@ oniro-app lint
 oniro-app build
 oniro-app app install
 oniro-app app launch
-oniro-app watch --bundle com.zuzu.openwhen --log OpenWhen   # app logs
+oniro-app watch --bundle com.zuzu.openwhen --log OpenWhen   # app logs (internal tag)
 ```
 
 Or run everything at once: `./scripts/dev-loop.sh` (lint → build → install → launch).

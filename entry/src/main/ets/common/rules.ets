@@ -1,4 +1,4 @@
-// Business rules for Open When — pure functions only (no @kit imports, no I/O),
+// Business rules for Kochanie — pure functions only (no @kit imports, no I/O),
 // so they can be unit-tested outside the device (see scripts/test-rules.sh).
 import { Box, Item, ItemType, Mood, Person } from './models';
 

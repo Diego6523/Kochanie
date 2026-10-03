@@ -1,4 +1,4 @@
-// Data model for Open When. Keep this file free of @kit imports so the rules
+// Data model for Kochanie. Keep this file free of @kit imports so the rules
 // can be unit-tested with plain Node (see scripts/test-rules.sh).
 
 export type ItemType = 'letter' | 'photo' | 'song';

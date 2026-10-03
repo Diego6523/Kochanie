@@ -122,7 +122,7 @@ struct Index {
   @Builder
   header() {
     Row() {
-      Text('Open When')
+      Text('Kochanie')
         .fontSize(22)
         .fontWeight(FontWeight.Bold)
         .fontColor(Theme.TEXT)
