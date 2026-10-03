@@ -102,9 +102,7 @@ export struct ListView {
           .fontColor(Theme.TEXT)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
-        Text(box.unlock.type === 'mood' ? moodLabel(box.unlock.mood) :
-          `To ${personLabel(box.to)} · ${box.status === 'sealed' && msUntilUnlock(box, this.now) > 0 ?
-            'unlocks in ' + formatCountdown(msUntilUnlock(box, this.now)) : 'unlock time reached'}`)
+        Text(this.sentSubtitle(box))
           .fontSize(12)
           .fontColor(Theme.MUTED)
       }
@@ -182,6 +180,18 @@ export struct ListView {
     }
     .width('100%')
     .layoutWeight(1)
+  }
+
+  private sentSubtitle(box: Box): string {
+    const to = `To ${personLabel(box.to)}`;
+    if (box.status === 'opened') {
+      return `${to} · opened`;
+    }
+    if (box.unlock.type === 'mood') {
+      return `${to} · ${moodLabel(box.unlock.mood)}`;
+    }
+    const left = msUntilUnlock(box, this.now);
+    return left > 0 ? `${to} · unlocks in ${formatCountdown(left)}` : `${to} · waiting to be opened`;
   }
 
   // Newest first.

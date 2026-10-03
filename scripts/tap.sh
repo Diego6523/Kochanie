@@ -2,7 +2,8 @@
 # Tap a UI node by its .id() or exact text, using `oniro-app dump` (normalized bounds "b").
 # Usage: scripts/tap.sh <id-or-text>
 set -euo pipefail
-read -r X Y < <(oniro-app dump 2>/dev/null | python3 -c "
+find_node() {
+oniro-app dump 2>/dev/null | python3 -c "
 import json,sys
 key=sys.argv[1]
 d=json.load(sys.stdin)
@@ -18,6 +19,14 @@ walk(d['tree'])
 if not hit: sys.exit('not found: '+key)
 b=hit[0]
 print(int((b[0]+b[2])/2*W), int((b[1]+b[3])/2*H))
-" "$1")
+" "$1"
+}
+# Retry: the UI may still be starting or animating.
+for i in 1 2 3 4 5; do
+  if POS=$(find_node "$1" 2>/dev/null); then break; fi
+  POS=""; sleep 1
+done
+[ -n "$POS" ] || { echo "not found: $1" >&2; exit 1; }
+read -r X Y <<< "$POS"
 oniro-app input --type click --x "$X" --y "$Y" >/dev/null
 echo "tapped $1 at $X,$Y"

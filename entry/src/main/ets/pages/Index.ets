@@ -1,10 +1,11 @@
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { Box, Person } from '../common/models';
 import { BoxStore } from '../common/store';
-import { personLabel } from '../common/rules';
+import { canOpen, markOpened, personLabel } from '../common/rules';
 import { Theme } from '../common/theme';
 import { ListView } from '../views/ListView';
 import { CreateView } from '../views/CreateView';
+import { OpenView } from '../views/OpenView';
 
 type ViewName = 'list' | 'create' | 'open';
 
@@ -54,6 +55,22 @@ struct Index {
       this.toast(`Box sealed for ${personLabel(box.to)}`);
       this.view = 'list';
     }
+  }
+
+  private openBox(): Box | undefined {
+    return this.boxes.find((b: Box) => b.id === this.openId);
+  }
+
+  // Rules are re-checked here so the stored data can never break them.
+  private markBoxOpened(id: string): void {
+    const now = Date.now();
+    const next = this.boxes.map((b: Box) => {
+      if (b.id === id && b.status === 'sealed' && canOpen(b, this.current, now).allowed) {
+        return markOpened(b, now);
+      }
+      return b;
+    });
+    this.persist(next);
   }
 
   @Builder
@@ -118,9 +135,16 @@ struct Index {
             this.view = 'list';
           }
         })
-      } else {
-        Text('Open view (tap to go back)').onClick(() => {
-          this.view = 'list';
+      } else if (this.openBox() !== undefined) {
+        OpenView({
+          box: this.openBox(),
+          current: this.current,
+          onOpened: (id: string) => {
+            this.markBoxOpened(id);
+          },
+          onBack: () => {
+            this.view = 'list';
+          }
         })
       }
     }
