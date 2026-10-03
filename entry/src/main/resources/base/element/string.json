@@ -2,15 +2,15 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "module description"
+      "value": "Open When: gift boxes for two that unlock at the right moment"
     },
     {
       "name": "EntryAbility_desc",
-      "value": "description"
+      "value": "Open When main ability"
     },
     {
       "name": "EntryAbility_label",
-      "value": "label"
+      "value": "Open When"
     }
   ]
 }

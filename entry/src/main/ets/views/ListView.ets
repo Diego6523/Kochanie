@@ -118,9 +118,13 @@ export struct ListView {
     .backgroundColor(Theme.CARD)
     .borderRadius(12)
     .onClick(() => {
-      this.getUIContext().getPromptAction().showToast({
-        message: `Only ${personLabel(box.to)} can open this box.`
-      });
+      try {
+        this.getUIContext().getPromptAction().showToast({
+          message: `Only ${personLabel(box.to)} can open this box.`
+        });
+      } catch (e) {
+        // Toast is only a hint; ignore failures.
+      }
     })
   }
 

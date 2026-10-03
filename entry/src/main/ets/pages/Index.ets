@@ -4,6 +4,7 @@ import { BoxStore } from '../common/store';
 import { personLabel } from '../common/rules';
 import { Theme } from '../common/theme';
 import { ListView } from '../views/ListView';
+import { CreateView } from '../views/CreateView';
 
 type ViewName = 'list' | 'create' | 'open';
 
@@ -20,6 +21,39 @@ struct Index {
     this.store = new BoxStore(this.getUIContext().getHostContext()!);
     this.boxes = this.store.load(Date.now());
     hilog.info(0x0001, 'OpenWhen', 'Loaded %{public}d boxes', this.boxes.length);
+  }
+
+  // System back returns to the list instead of leaving the app.
+  onBackPress(): boolean {
+    if (this.view !== 'list') {
+      this.view = 'list';
+      return true;
+    }
+    return false;
+  }
+
+  private toast(message: string): void {
+    try {
+      this.getUIContext().getPromptAction().showToast({ message: message });
+    } catch (e) {
+      hilog.warn(0x0001, 'OpenWhen', 'toast failed: %{public}s', message);
+    }
+  }
+
+  private persist(next: Box[]): boolean {
+    if (this.store === null || !this.store.save(next)) {
+      this.toast('Could not save. Please try again.');
+      return false;
+    }
+    this.boxes = next;
+    return true;
+  }
+
+  private addBox(box: Box): void {
+    if (this.persist(this.boxes.concat([box]))) {
+      this.toast(`Box sealed for ${personLabel(box.to)}`);
+      this.view = 'list';
+    }
   }
 
   @Builder
@@ -75,8 +109,14 @@ struct Index {
           }
         })
       } else if (this.view === 'create') {
-        Text('Create view (tap to go back)').onClick(() => {
-          this.view = 'list';
+        CreateView({
+          current: this.current,
+          onSeal: (box: Box) => {
+            this.addBox(box);
+          },
+          onCancel: () => {
+            this.view = 'list';
+          }
         })
       } else {
         Text('Open view (tap to go back)').onClick(() => {
