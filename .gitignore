@@ -1,0 +1,24 @@
+# Build outputs / caches
+/node_modules
+/oh_modules
+/entry/oh_modules
+/.hvigor
+/.idea
+/entry/build
+/entry/.preview
+/build
+*.hap
+*.app
+
+# Machine-specific
+/local.properties
+
+# Signing materials & secrets — never commit
+/signatures
+*.p12
+*.p7b
+*.cer
+*.pem
+*.csr
+.env
+.env.*
