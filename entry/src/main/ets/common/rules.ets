@@ -182,3 +182,23 @@ export function markOpened(box: Box, now: number): Box {
   };
   return opened;
 }
+
+// The box the widget counts down to: the sealed date box that unlocks soonest in the future.
+// If none is still counting down, the most recently unlocked unopened one ("ready to open").
+export function nextCountdownBox(boxes: Box[], now: number): Box | undefined {
+  let upcoming: Box | undefined = undefined;
+  let ready: Box | undefined = undefined;
+  for (const b of boxes) {
+    if (b.status !== 'sealed' || b.unlock.type !== 'date' || b.unlock.at === undefined) {
+      continue;
+    }
+    if (b.unlock.at > now) {
+      if (upcoming === undefined || b.unlock.at < (upcoming.unlock.at ?? 0)) {
+        upcoming = b;
+      }
+    } else if (ready === undefined || b.unlock.at > (ready.unlock.at ?? 0)) {
+      ready = b;
+    }
+  }
+  return upcoming ?? ready;
+}

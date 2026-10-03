@@ -52,6 +52,34 @@ as things to fix) → `oniro-app app install` + `launch` → drive the UI with
   from state inside the builder. Found only by watching the countdown on the emulator.
 - The launcher label read "label" (template default). It is now "Open When".
 
+## Round 2: timed unlocks that work without the app
+
+Prompt: "can you make the time functionality work? and do a quick example that can be opened a
+couple of minutes from now (and actually that should be automatic, widget like)".
+
+The agent read this as: date unlocks must notify even with the app closed, plus a self-updating
+home-screen widget, plus a real example box on the emulator. It added `reminderAgentManager`
+reminders, a FormExtensionAbility widget with a `TextTimer` countdown, and deep links from both
+into the box.
+
+Verified on the emulator: with the app closed, the notification arrived at the exact unlock
+second (`anm dump` DeliveryTime). Tapping it opened the right box as the recipient. The widget
+counted down live, flipped to "Ready to open!" at zero, and tapping it opened the box.
+
+Bugs found while verifying:
+- Selection chips never changed highlight (another by-value `@Builder` parameter). Fixed with a
+  `Chip` component that takes `@Prop selected`.
+- The notification prompt appeared while scripted taps were running and got denied. The request
+  now happens when sealing a date box, not at launch.
+- The widget showed `01:00` for a box that was already unlocked: `TextTimer` treats count 0 as
+  60 s, and `ready` depended on a field that had not arrived yet.
+- The widget did not tick: the controller was started before `TextTimer` existed. It now also
+  starts in `onAppear`.
+- The widget stuck at `00:00`: `onTimer`'s `elapsedTime` is not in ms. It now compares against
+  the clock.
+- After reinstalling, the launcher keeps a dead widget renderer (system log). Documented:
+  re-add the widget.
+
 ## What the developer did
 
 Wrote the brief and product idea, set up the Linux toolchain and emulator, answered the agent's

@@ -11,6 +11,18 @@
     {
       "name": "EntryAbility_label",
       "value": "Open When"
+    },
+    {
+      "name": "widget_name",
+      "value": "Next box"
+    },
+    {
+      "name": "widget_desc",
+      "value": "Live countdown to the next Open When box"
+    },
+    {
+      "name": "reminder_reason",
+      "value": "Notify you the moment a box unlocks"
     }
   ]
 }

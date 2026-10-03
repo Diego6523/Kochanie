@@ -21,6 +21,17 @@ switches between the two partners so you can demo both sides on one emulator.
   shows the photo, letter and song link.
 - Data persists locally (`@ohos.data.preferences`). Two demo boxes are seeded on first launch.
 
+## Unlocks without opening the app
+
+- **System reminder:** sealing a date box schedules a `reminderAgentManager` timer reminder. At
+  unlock time, "A box just unlocked" arrives as a notification even when the app is closed.
+  Tapping it opens the app as the recipient, straight onto that box. The system asks for
+  notification permission the first time you seal a date box.
+- **Home-screen widget ("Next box"):** long-press the app icon → *add widget to desktop*. It
+  shows the next box with a live countdown (`TextTimer`) and flips to **Ready to open!** at
+  zero by itself. If nothing is counting down, it shows the most recently unlocked unopened
+  box. Tapping it opens that box. The app pushes fresh data to the widget on every change.
+
 ## Business rules
 
 All in `entry/src/main/ets/common/rules.ets` (pure functions, unit-tested):
@@ -92,7 +103,7 @@ The rules module has no `@kit` imports, so its tests run on the host with Node's
 stripping (no device needed):
 
 ```bash
-./scripts/test-rules.sh       # 14 tests, node:test
+./scripts/test-rules.sh       # 15 tests, node:test
 ```
 
 hvigor's local unit-test runner (`entry/src/test`, Hypium) needs DevEco Studio, so it is not
@@ -110,10 +121,15 @@ used here. UI flows were verified on the emulator with `oniro-app dump` / `input
 
 ## Known limitations
 
+- After reinstalling the app (`oniro-app app install`), the launcher keeps a dead renderer for
+  an existing widget (`UpdateForm failed … invalid FormRendererGroup` in hilog), so it stops
+  updating. Remove the widget and add it again. Normal use (no reinstall) is not affected.
+- If you deny the notification prompt, the emulator's Settings app has no per-app toggle to
+  undo it. Uninstall and reinstall the app to be asked again.
 - The emulator has no browser, so tapping a song link shows the system "Cannot open this file"
   dialog. On a device with a browser the link opens normally.
-- Phase 1 is single-device (both partners on one phone). Planned for Phase 2: home-screen widget,
-  system reminders for date unlocks, a 3D gift box, and a backend with pairing for two devices.
+- Single-device prototype (both partners on one phone). Still planned: a 3D gift box, and a
+  backend with pairing for two devices.
 
 ## Project layout
 
@@ -124,6 +140,11 @@ entry/src/main/ets/
   common/store.ets      preferences persistence + demo seed
   common/photos.ets     bundled demo photos
   common/theme.ets      colors
+  common/reminders.ets  unlock notifications (reminderAgentManager)
+  common/widget.ets     widget data + refresh, widget id bookkeeping
+  entryability/         deep links from reminder / widget taps
+  formability/          NextBoxFormAbility (widget provider)
+  widget/pages/         NextBoxCard (widget UI)
   pages/Index.ets       single @Entry page, view switch, Me/Her toggle
   views/ListView.ets    list
   views/CreateView.ets  create

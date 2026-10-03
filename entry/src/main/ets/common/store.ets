@@ -49,8 +49,17 @@ function demoBoxes(now: number): Box[] {
 export class BoxStore {
   private prefs: preferences.Preferences;
 
-  constructor(context: common.Context) {
+  // fresh = true drops this process's cached copy first (used by the widget process,
+  // which must see what the app process wrote).
+  constructor(context: common.Context, fresh: boolean = false) {
     const options: preferences.Options = { name: PREFS_NAME };
+    if (fresh) {
+      try {
+        preferences.removePreferencesFromCacheSync(context, options);
+      } catch (e) {
+        hilog.warn(DOMAIN, TAG, 'removePreferencesFromCacheSync failed');
+      }
+    }
     this.prefs = preferences.getPreferencesSync(context, options);
   }
 

@@ -1,6 +1,9 @@
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { Box, Person } from '../common/models';
 import { BoxStore } from '../common/store';
+import { common } from '@kit.AbilityKit';
+import { ensureNotificationsEnabled, scheduleUnlockReminder } from '../common/reminders';
+import { refreshAllWidgets } from '../common/widget';
 import { canOpen, markOpened, personLabel } from '../common/rules';
 import { Theme } from '../common/theme';
 import { ListView } from '../views/ListView';
@@ -16,12 +19,29 @@ struct Index {
   @State current: Person = 'me';
   @State boxes: Box[] = [];
   @State openId: string = '';
+  // Set by EntryAbility when a reminder or the widget is tapped.
+  @StorageProp('deepLinkBox') @Watch('onDeepLink') deepLink: string = '';
   private store: BoxStore | null = null;
 
   aboutToAppear(): void {
-    this.store = new BoxStore(this.getUIContext().getHostContext()!);
+    const ctx = this.getUIContext().getHostContext()! as common.UIAbilityContext;
+    this.store = new BoxStore(ctx);
     this.boxes = this.store.load(Date.now());
     hilog.info(0x0001, 'OpenWhen', 'Loaded %{public}d boxes', this.boxes.length);
+    refreshAllWidgets(ctx, this.boxes);
+    this.onDeepLink();
+  }
+
+  onDeepLink(): void {
+    const id = this.deepLink.split('#')[0];
+    const box = this.boxes.find((b: Box) => b.id === id);
+    if (box === undefined) {
+      return;
+    }
+    // Open as the recipient, so the demo lands on the right side.
+    this.current = box.to;
+    this.openId = id;
+    this.view = 'open';
   }
 
   // System back returns to the list instead of leaving the app.
@@ -47,13 +67,23 @@ struct Index {
       return false;
     }
     this.boxes = next;
+    refreshAllWidgets(this.getUIContext().getHostContext()!, next);
     return true;
   }
 
   private addBox(box: Box): void {
     if (this.persist(this.boxes.concat([box]))) {
-      this.toast(`Box sealed for ${personLabel(box.to)}`);
       this.view = 'list';
+      if (box.unlock.type !== 'date') {
+        this.toast(`Box sealed for ${personLabel(box.to)}`);
+        return;
+      }
+      // Ask for notification permission at the moment it matters: sealing a date box.
+      const ctx = this.getUIContext().getHostContext()! as common.UIAbilityContext;
+      ensureNotificationsEnabled(ctx).then(() => scheduleUnlockReminder(box, Date.now())).then((ok: boolean) => {
+        this.toast(ok ? `Box sealed. ${personLabel(box.to)} gets a notification when it unlocks.`
+          : `Box sealed for ${personLabel(box.to)} (notification could not be scheduled).`);
+      });
     }
   }
 

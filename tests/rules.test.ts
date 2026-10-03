@@ -1,7 +1,7 @@
 // Unit tests for entry/src/main/ets/common/rules.ets — run with scripts/test-rules.sh
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { validateBox, canOpen, isUnlocked, msUntilUnlock, formatCountdown, markOpened } from './rules.ts';
+import { validateBox, canOpen, isUnlocked, msUntilUnlock, formatCountdown, markOpened, nextCountdownBox } from './rules.ts';
 import type { Box, Item } from './models.ts';
 
 const NOW = 1_700_000_000_000;
@@ -110,4 +110,15 @@ test('markOpened sets status and keeps first openedAt', () => {
   assert.equal(o.status, 'opened');
   assert.equal(o.openedAt, NOW + 5);
   assert.equal(markOpened(o, NOW + 99).openedAt, NOW + 5);
+});
+
+test('nextCountdownBox prefers the soonest upcoming box, then the latest ready one', () => {
+  const a = dateBox({ id: 'a', unlock: { type: 'date', at: NOW + 5000 } });
+  const b = dateBox({ id: 'b', unlock: { type: 'date', at: NOW + 1000 } });
+  const ready = dateBox({ id: 'r', unlock: { type: 'date', at: NOW - 1000 } });
+  const opened = dateBox({ id: 'c', unlock: { type: 'date', at: NOW + 10 }, status: 'opened' });
+  assert.equal(nextCountdownBox([a, ready, b, opened, moodBox({ id: 'm' })], NOW)?.id, 'b');
+  const older = dateBox({ id: 'o', unlock: { type: 'date', at: NOW - 9000 } });
+  assert.equal(nextCountdownBox([older, ready, opened], NOW)?.id, 'r');
+  assert.equal(nextCountdownBox([opened, moodBox()], NOW), undefined);
 });
