@@ -1,23 +1,26 @@
+import { hilog } from '@kit.PerformanceAnalysisKit';
+import { Box } from '../common/models';
+import { BoxStore } from '../common/store';
+
 @Entry
 @Component
 struct Index {
-  @State message: string = 'Hello World';
+  @State boxes: Box[] = [];
+  private store: BoxStore | null = null;
+
+  aboutToAppear(): void {
+    this.store = new BoxStore(this.getUIContext().getHostContext()!);
+    this.boxes = this.store.load(Date.now());
+    hilog.info(0x0001, 'OpenWhen', 'Loaded %{public}d boxes: %{public}s', this.boxes.length,
+      JSON.stringify(this.boxes.map((b: Box) => b.title)));
+  }
 
   build() {
-    RelativeContainer() {
-      Text(this.message)
-        .id('HelloWorld')
-        .fontSize($r('app.float.page_text_font_size'))
-        .fontWeight(FontWeight.Bold)
-        .alignRules({
-          center: { anchor: '__container__', align: VerticalAlign.Center },
-          middle: { anchor: '__container__', align: HorizontalAlign.Center }
-        })
-        .onClick(() => {
-          this.message = 'Welcome';
-        })
+    Column() {
+      Text(`Boxes: ${this.boxes.length}`).fontSize(24)
     }
     .height('100%')
     .width('100%')
+    .justifyContent(FlexAlign.Center)
   }
 }
