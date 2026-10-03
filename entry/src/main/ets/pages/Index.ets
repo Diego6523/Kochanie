@@ -3,6 +3,7 @@ import { Box, Person } from '../common/models';
 import { BoxStore } from '../common/store';
 import { personLabel } from '../common/rules';
 import { Theme } from '../common/theme';
+import { ListView } from '../views/ListView';
 
 type ViewName = 'list' | 'create' | 'open';
 
@@ -62,11 +63,17 @@ struct Index {
     Column() {
       this.header()
       if (this.view === 'list') {
-        Text(`List view (${this.boxes.length} boxes) — as ${personLabel(this.current)}`)
-          .fontColor(Theme.TEXT)
-          .onClick(() => {
+        ListView({
+          boxes: this.boxes,
+          current: this.current,
+          onOpen: (id: string) => {
+            this.openId = id;
+            this.view = 'open';
+          },
+          onCreate: () => {
             this.view = 'create';
-          })
+          }
+        })
       } else if (this.view === 'create') {
         Text('Create view (tap to go back)').onClick(() => {
           this.view = 'list';
